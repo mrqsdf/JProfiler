@@ -111,5 +111,49 @@ public class CSS {
             .addProperty("color", COLOR_RED)
             .addProperty("text-align", TEXT_ALIGN_CENTER)
             .addProperty("padding", PADDING_MEDIUM);
+
+        // Button component
+        CSSManager.addRule(".button_component")
+            .addProperty("display", DISPLAY_INLINE_BLOCK)
+            .addProperty("margin", MARGIN_SMALL);
+
+        CSSManager.addRule(".button_element")
+            .addProperty("padding", PADDING_MEDIUM)
+            .addProperty("font-size", FONT_SIZE_NORMAL)
+            .addProperty("background-color", COLOR_BLUE)
+            .addProperty("color", COLOR_WHITE)
+            .addProperty("border", BORDER_NONE)
+            .addProperty("border-radius", "4px")
+            .addProperty("cursor", "pointer")
+            .addProperty("transition", "background-color 0.3s");
+
+        CSSManager.addRule(".button_element:hover")
+            .addProperty("background-color", COLOR_DARK_GRAY);
+
+        // TextFieldComponent
+        CSSManager.addRule(".textfield_component")
+            .addProperty("margin", MARGIN_SMALL)
+            .addProperty("display", DISPLAY_BLOCK);
+
+        CSSManager.addRule(".textfield_element")
+            .addProperty("padding", PADDING_SMALL)
+            .addProperty("font-size", FONT_SIZE_NORMAL)
+            .addProperty("border", BORDER_LIGHT)
+            .addProperty("border-radius", "4px")
+            .addProperty("width", "100%")
+            .addProperty("box-sizing", "border-box");
+
+        // CheckboxComponent
+        CSSManager.addRule(".checkbox_component")
+            .addProperty("display", DISPLAY_INLINE_BLOCK)
+            .addProperty("margin", MARGIN_SMALL);
+
+        CSSManager.addRule(".checkbox_element")
+            .addProperty("margin-right", PADDING_SMALL)
+            .addProperty("cursor", "pointer");
+
+        CSSManager.addRule(".checkbox_label")
+            .addProperty("cursor", "pointer")
+            .addProperty("user-select", "none");
     }
 }

@@ -87,11 +87,26 @@ public class Page {
             .map(Component::getContent)
             .toArray(DomContent[]::new);
 
-        return div(
-            !headerComponents.isEmpty() ? header(headerContent).withClass("page_header") : null,
-            !bodyComponents.isEmpty() ? main(bodyContent).withClass("page_body") : null,
-            !footerComponents.isEmpty() ? footer(footerContent).withClass("page_footer") : null
-        ).withClass("page").withId(id);
+        List<DomContent> pageChildren = new ArrayList<>();
+        
+        // Add header
+        if (!headerComponents.isEmpty()) {
+            pageChildren.add(header(headerContent).withClass("page_header"));
+        }
+        
+        // Add body components directly (not wrapped in main)
+        for (Component component : bodyComponents) {
+            pageChildren.add(component.getContent());
+        }
+        
+        // Add footer
+        if (!footerComponents.isEmpty()) {
+            pageChildren.add(footer(footerContent).withClass("page_footer"));
+        }
+
+        return div(pageChildren.toArray(new DomContent[0]))
+            .withClass("page")
+            .withId(id);
     }
 
     public void clear() {
