@@ -9,7 +9,12 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.AsyncContext;
+
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.function.Supplier;
 
 public class JProfilerServer {
@@ -69,7 +74,83 @@ public class JProfilerServer {
             }
         });
 
-        context.addServlet(mainHolder, "/*");
+        // JavaScript resource servlet
+        ServletHolder jsHolder = new ServletHolder(new HttpServlet() {
+            @Override
+            protected void doGet(HttpServletRequest request, HttpServletResponse response)
+                    throws ServletException, IOException {
+                response.setContentType("application/javascript;charset=utf-8");
+                response.setStatus(HttpServletResponse.SC_OK);
+                
+                try (InputStream is = getClass().getClassLoader().getResourceAsStream("jprofiler-dynamic.js")) {
+                    if (is != null) {
+                        response.getWriter().write(new String(is.readAllBytes(), StandardCharsets.UTF_8));
+                    } else {
+                        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                        response.getWriter().println("// JS file not found");
+                    }
+                }
+            }
+        });
+
+        // SSE Updates servlet
+        ServletHolder sseHolder = new ServletHolder(new HttpServlet() {
+            @Override
+            protected void doGet(HttpServletRequest request, HttpServletResponse response)
+                    throws ServletException, IOException {
+                response.setContentType("text/event-stream");
+                response.setCharacterEncoding("UTF-8");
+                response.setHeader("Cache-Control", "no-cache");
+                response.setHeader("Connection", "keep-alive");
+                response.setStatus(HttpServletResponse.SC_OK);
+
+                final AsyncContext asyncContext = request.startAsync();
+                asyncContext.setTimeout(0);
+
+                final PrintWriter writer = response.getWriter();
+
+                UpdateManager.UpdateListener listener = json -> {
+                    try {
+                        writer.write("data: " + json + "\n\n");
+                        writer.flush();
+                    } catch (Exception e) {
+                        System.err.println("Error sending SSE update: " + e.getMessage());
+                    }
+                };
+
+                UpdateManager.getInstance().addListener(listener);
+
+                // Send initial connection message
+                writer.write("data: {\"type\":\"connected\"}\n\n");
+                writer.flush();
+
+                asyncContext.addListener(new jakarta.servlet.AsyncListener() {
+                    @Override
+                    public void onComplete(jakarta.servlet.AsyncEvent event) {
+                        UpdateManager.getInstance().removeListener(listener);
+                    }
+
+                    @Override
+                    public void onTimeout(jakarta.servlet.AsyncEvent event) {
+                        UpdateManager.getInstance().removeListener(listener);
+                        asyncContext.complete();
+                    }
+
+                    @Override
+                    public void onError(jakarta.servlet.AsyncEvent event) {
+                        UpdateManager.getInstance().removeListener(listener);
+                    }
+
+                    @Override
+                    public void onStartAsync(jakarta.servlet.AsyncEvent event) {
+                    }
+                });
+            }
+        });
+
+        context.addServlet(mainHolder, "/");
+        context.addServlet(jsHolder, "/jprofiler-dynamic.js");
+        context.addServlet(sseHolder, "/updates");
         server.setHandler(context);
 
         server.start();

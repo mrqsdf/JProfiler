@@ -5,6 +5,7 @@ import fr.mrqsdf.jprofiler.css.CSSManager;
 import fr.mrqsdf.jprofiler.page.Page;
 import fr.mrqsdf.jprofiler.page.PageManager;
 import fr.mrqsdf.jprofiler.server.JProfilerServer;
+import fr.mrqsdf.jprofiler.server.UpdateManager;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -80,6 +81,19 @@ public class JProfiler {
         PageManager.clearAll();
     }
 
+    // ===== Dynamic updates =====
+    public static void updateComponent(String componentId, String text) {
+        UpdateManager.getInstance().updateTextComponent(componentId, text);
+    }
+
+    public static void updatePlaceholder(String componentId, String placeholder, String value) {
+        UpdateManager.getInstance().updatePlaceholder(componentId, placeholder, value);
+    }
+
+    public static void updateHTML(String componentId, String html) {
+        UpdateManager.getInstance().updateHTML(componentId, html);
+    }
+
     // ===== HTML generation =====
     public static String generateHTML() {
         StringBuilder html = new StringBuilder();
@@ -99,6 +113,7 @@ public class JProfiler {
         html.append("<script>\n");
         html.append(getJavaScriptCode());
         html.append("</script>\n");
+        html.append("<script src=\"/jprofiler-dynamic.js\"></script>\n");
         
         html.append("</head>\n<body>\n");
         
