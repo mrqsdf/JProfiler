@@ -1,0 +1,50 @@
+plugins {
+    id 'java'
+    id 'java-library'
+    id 'maven-publish'
+}
+
+group = 'fr.mrqsdf'
+version = '1.0.0'
+
+repositories {
+    mavenCentral()
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21) // Jetty 12 nécessite au minimum Java 17
+    }
+    withSourcesJar()
+    withJavadocJar()
+}
+
+dependencies {
+    // --- Jetty (embarqué) ---
+    // BOM Jetty pour garder des versions cohérentes sur tous les modules Jetty
+    implementation platform("org.eclipse.jetty:jetty-bom:12.1.5")
+
+    // Servlet container Jetty (Jakarta EE 11)
+    implementation "org.eclipse.jetty.ee11:jetty-ee11-servlet:12.1.5"
+
+    runtimeOnly "org.eclipse.jetty:jetty-slf4j-impl"
+
+    // --- UI / JSON ---
+    implementation "com.j2html:j2html:1.6.0"
+    implementation "com.google.code.gson:gson:2.13.2"
+
+    // --- Tests ---
+    testImplementation "org.junit.jupiter:junit-jupiter:5.11.4"
+}
+
+test {
+    useJUnitPlatform()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+}
