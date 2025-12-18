@@ -2,7 +2,6 @@ package fr.mrqsdf.jprofiler.component;
 
 import static j2html.TagCreator.div;
 
-import fr.mrqsdf.jprofiler.css.CSSRule;
 import j2html.tags.specialized.DivTag;
 
 import java.util.HashMap;

@@ -34,7 +34,7 @@ CSS.setupDefaultStyles();
 CSSManager.addRule(".title").addProperty("font-size", "24px");
 
 Page home = JProfiler.createPage("home", "JProfiler Demo");
-TextComponent title = new TextComponent("<h1>Welcome</h1>", "title");
+TextComponent title = new TextComponent("Welcome", "title");
 ButtonComponent goForm = new ButtonComponent("Go to Form", "button", ActionType.NAVIGATE_PAGE, "simpleForm", "goFormBtn");
 
 home.addToBody(title);
@@ -42,12 +42,6 @@ home.addToBody(goForm);
 
 JProfiler.setCurrentPage("home");
 JProfiler.startServerAsync(8080);
-```
-
-Run:
-
-```bash
-./gradlew run --args='fr.mrqsdf.jprofiler.JProfilerMain'
 ```
 
 ---
@@ -66,8 +60,8 @@ See: [Page.java](src/main/java/fr/mrqsdf/jprofiler/page/Page.java)
 
 All components render HTML using `j2html` with proper IDs and data attributes to support dynamic updates and event wiring.
 
-- **TextComponent**: `new TextComponent(String htmlOrText, String className)` or `new TextComponent(String htmlOrText, String className, String id)`
-  - Use inline HTML safely for formatting: `"<h1>Title</h1>"`
+- **TextComponent**: `new TextComponent(String text, String className)` or `new TextComponent(String text, String className, String id)`
+  - Use inline HTML safely for formatting: `"Title"`
 
 - **ButtonComponent**: `new ButtonComponent(String text, String className, ActionType actionType, String actionData, String id)`
   - Navigation: `ActionType.NAVIGATE_PAGE` with `actionData = "targetPageId"`
@@ -250,8 +244,3 @@ page.addToBody(sendButton);
 page.addToBody(counterDisplay);
 ```
 
----
-
-## License
-
-This repository is for demonstration purposes. Add your license if applicable.
