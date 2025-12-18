@@ -10,7 +10,7 @@ public class TextFieldComponent extends Component {
     private final String placeholder;
     private final String className;
     private final String type;
-    private final String value;
+    private String value;
 
     public TextFieldComponent(String id, String placeholder, String className) {
         this(id, placeholder, className, "text", "");
@@ -27,6 +27,7 @@ public class TextFieldComponent extends Component {
         this.className = className;
         this.type = type;
         this.value = value;
+        addDataAttribute("field-value", value);
     }
 
     private static DivTag createTextFieldDiv(String id, String placeholder, String className, String type, String value) {
@@ -38,6 +39,7 @@ public class TextFieldComponent extends Component {
                 .withPlaceholder(placeholder)
                 .withClass("textfield_element " + className)
                 .attr("value", value.isEmpty() ? null : value)
+                .attr("data-value", value)
         ).withClass("textfield_component " + className);
     }
 
@@ -59,6 +61,12 @@ public class TextFieldComponent extends Component {
 
     public String getValue() {
         return value;
+    }
+
+    public void updateValue(String newValue) {
+        this.value = newValue;
+        this.componentContent = createTextFieldDiv(id, placeholder, className, type, newValue);
+        addDataAttribute("field-value", newValue);
     }
 
     @Override

@@ -90,8 +90,33 @@ public class JProfiler {
         UpdateManager.getInstance().updatePlaceholder(componentId, placeholder, value);
     }
 
-    public static void updateHTML(String componentId, String html) {
-        UpdateManager.getInstance().updateHTML(componentId, html);
+    // Dynamic updates for all component types
+    public static void updateTextContent(String id, String text) {
+        UpdateManager.getInstance().updateTextComponent(id, text);
+    }
+
+    public static void updateImage(String id, String base64Image) {
+        UpdateManager.getInstance().updateImage(id, base64Image);
+    }
+
+    public static void updateChart(String id, String svgHtml) {
+        UpdateManager.getInstance().updateChart(id, svgHtml);
+    }
+
+    public static void updateButtonText(String id, String text) {
+        UpdateManager.getInstance().updateButtonText(id, text);
+    }
+
+    public static void updateFieldValue(String id, String value) {
+        UpdateManager.getInstance().updateFieldValue(id, value);
+    }
+
+    public static void updateCheckboxState(String id, boolean checked) {
+        UpdateManager.getInstance().updateCheckboxState(id, checked);
+    }
+
+    public static void updateHTML(String id, String html) {
+        UpdateManager.getInstance().updateHTML(id, html);
     }
 
     // ===== HTML generation =====

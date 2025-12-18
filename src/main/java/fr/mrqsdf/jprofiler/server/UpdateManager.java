@@ -74,6 +74,56 @@ public class UpdateManager {
         broadcast(gson.toJson(json));
     }
 
+    public void updateImage(String id, String base64Image) {
+        JsonObject json = new JsonObject();
+        json.addProperty("type", "image");
+        json.addProperty("id", id);
+        json.addProperty("base64", base64Image);
+
+        componentStates.put(id, base64Image);
+        broadcast(gson.toJson(json));
+    }
+
+    public void updateChart(String id, String svgHtml) {
+        JsonObject json = new JsonObject();
+        json.addProperty("type", "chart");
+        json.addProperty("id", id);
+        json.addProperty("svg", svgHtml);
+
+        componentStates.put(id, svgHtml);
+        broadcast(gson.toJson(json));
+    }
+
+    public void updateButtonText(String id, String text) {
+        JsonObject json = new JsonObject();
+        json.addProperty("type", "button-text");
+        json.addProperty("id", id);
+        json.addProperty("text", text);
+
+        componentStates.put(id, text);
+        broadcast(gson.toJson(json));
+    }
+
+    public void updateFieldValue(String id, String value) {
+        JsonObject json = new JsonObject();
+        json.addProperty("type", "field-value");
+        json.addProperty("id", id);
+        json.addProperty("value", value);
+
+        componentStates.put(id, value);
+        broadcast(gson.toJson(json));
+    }
+
+    public void updateCheckboxState(String id, boolean checked) {
+        JsonObject json = new JsonObject();
+        json.addProperty("type", "checkbox-state");
+        json.addProperty("id", id);
+        json.addProperty("checked", checked);
+
+        componentStates.put(id, checked);
+        broadcast(gson.toJson(json));
+    }
+
     private void broadcast(String json) {
         for (UpdateListener listener : listeners) {
             try {

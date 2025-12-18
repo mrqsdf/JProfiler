@@ -25,6 +25,7 @@ public class DynamicTextComponent extends Component {
         this.className = className;
         this.placeholders = new HashMap<>();
         extractPlaceholders();
+        addDataAttribute("template", text);
     }
 
     private void extractPlaceholders() {

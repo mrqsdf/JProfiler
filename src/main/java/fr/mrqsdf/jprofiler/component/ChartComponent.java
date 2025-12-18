@@ -12,31 +12,51 @@ public class ChartComponent extends Component {
         BAR, LINE, PIE
     }
 
-    private final List<Double> data;
-    private final List<String> labels;
+    private List<Double> data;
+    private List<String> labels;
     private final ChartType type;
     private final String title;
     private final String className;
+    private final String id;
 
     public ChartComponent(List<Double> data, List<String> labels, ChartType type, String title, String className) {
-        super(createChartDiv(data, labels, type, title, className));
+        this(data, labels, type, title, className, null);
+    }
+
+    public ChartComponent(List<Double> data, List<String> labels, ChartType type, String title, String className, String id) {
+        super(createChartDiv(data, labels, type, title, className, id));
         this.data = data;
         this.labels = labels;
         this.type = type;
         this.title = title;
         this.className = className;
+        this.id = id;
+        if (id != null) {
+            String chartSvg = switch (type) {
+                case BAR -> generateBarChart(data, labels, title);
+                case LINE -> generateLineChart(data, labels, title);
+                case PIE -> generatePieChart(data, labels, title);
+            };
+            addDataAttribute("chart-svg", chartSvg);
+        }
     }
 
-    private static DivTag createChartDiv(List<Double> data, List<String> labels, ChartType type, String title, String className) {
+    private static DivTag createChartDiv(List<Double> data, List<String> labels, ChartType type, String title, String className, String id) {
         String chartSvg = switch (type) {
             case BAR -> generateBarChart(data, labels, title);
             case LINE -> generateLineChart(data, labels, title);
             case PIE -> generatePieChart(data, labels, title);
         };
 
-        return div(
+        DivTag div = div(
             rawHtml(chartSvg)
         ).withClass("chart_component " + className);
+        
+        if (id != null) {
+            div = div.withId(id).attr("data-chart-svg", chartSvg);
+        }
+        
+        return div;
     }
 
     private static String generateBarChart(List<Double> data, List<String> labels, String title) {
@@ -212,6 +232,22 @@ public class ChartComponent extends Component {
 
     public String getClassName() {
         return className;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void updateChart(List<Double> newData, List<String> newLabels) {
+        this.data = newData;
+        this.labels = newLabels;
+        this.componentContent = createChartDiv(newData, newLabels, type, title, className, id);
+        String chartSvg = switch (type) {
+            case BAR -> generateBarChart(newData, newLabels, title);
+            case LINE -> generateLineChart(newData, newLabels, title);
+            case PIE -> generatePieChart(newData, newLabels, title);
+        };
+        addDataAttribute("chart-svg", chartSvg);
     }
 
     @Override

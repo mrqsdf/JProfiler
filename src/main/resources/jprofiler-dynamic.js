@@ -64,6 +64,16 @@
             updatePlaceholder(data.id, data.placeholder, data.value);
         } else if (data.type === 'html') {
             updateHTML(data.id, data.html);
+        } else if (data.type === 'image') {
+            updateImageComponent(data.id, data.base64);
+        } else if (data.type === 'chart') {
+            updateChartComponent(data.id, data.svg);
+        } else if (data.type === 'button-text') {
+            updateButtonTextComponent(data.id, data.text);
+        } else if (data.type === 'field-value') {
+            updateFieldValueComponent(data.id, data.value);
+        } else if (data.type === 'checkbox-state') {
+            updateCheckboxComponent(data.id, data.checked);
         }
     }
 
@@ -112,6 +122,73 @@
             element.innerHTML = html;
         } else {
             console.warn('Element not found:', id);
+        }
+    }
+
+    function updateImageComponent(id, base64Image) {
+        const element = document.getElementById(id);
+        if (element) {
+            // Find the img tag inside the component
+            const imgElement = element.querySelector('img');
+            if (imgElement) {
+                imgElement.src = 'data:image/png;base64,' + base64Image;
+                console.log('Updated image', id);
+            } else {
+                console.warn('Image element not found in:', id);
+            }
+        } else {
+            console.warn('Component element not found:', id);
+        }
+    }
+
+    function updateChartComponent(id, svgHtml) {
+        const element = document.getElementById(id);
+        if (element) {
+            element.innerHTML = svgHtml;
+            console.log('Updated chart', id);
+        } else {
+            console.warn('Element not found:', id);
+        }
+    }
+
+    function updateButtonTextComponent(id, text) {
+        const element = document.getElementById(id);
+        if (element) {
+            const buttonElement = element.querySelector('button');
+            if (buttonElement) {
+                buttonElement.textContent = text;
+                console.log('Updated button text', id);
+            }
+        } else {
+            console.warn('Button element not found:', id);
+        }
+    }
+
+    function updateFieldValueComponent(id, value) {
+        const element = document.getElementById(id);
+        if (element) {
+            const inputElement = element.querySelector('input');
+            if (inputElement) {
+                inputElement.value = value;
+                inputElement.setAttribute('data-value', value);
+                console.log('Updated field value', id);
+            }
+        } else {
+            console.warn('Field element not found:', id);
+        }
+    }
+
+    function updateCheckboxComponent(id, checked) {
+        const element = document.getElementById(id);
+        if (element) {
+            const checkboxElement = element.querySelector('input[type="checkbox"]');
+            if (checkboxElement) {
+                checkboxElement.checked = checked;
+                checkboxElement.setAttribute('data-checked', checked ? 'true' : 'false');
+                console.log('Updated checkbox state', id, checked);
+            }
+        } else {
+            console.warn('Checkbox element not found:', id);
         }
     }
 

@@ -14,26 +14,44 @@ import j2html.tags.specialized.DivTag;
 
 public class ImageComponent extends Component {
 
-    private final BufferedImage image;
+    private BufferedImage image;
     private final String altText;
     private final String className;
+    private final String id;
 
     public ImageComponent(BufferedImage image, String altText, String className) {
-        super(createImageDiv(image, altText, className));
+        this(image, altText, className, null);
+    }
+
+    public ImageComponent(BufferedImage image, String altText, String className, String id) {
+        super(createImageDiv(image, altText, className, id));
         this.image = image;
         this.altText = altText;
         this.className = className;
+        this.id = id;
+        if (id != null) {
+            try {
+                String base64Image = encodeImageToBase64(image);
+                addDataAttribute("image-base64", base64Image);
+            } catch (IOException e) {
+                // Silently ignore
+            }
+        }
     }
 
-    private static DivTag createImageDiv(BufferedImage image, String altText, String className) {
+    private static DivTag createImageDiv(BufferedImage image, String altText, String className, String id) {
         try {
             String base64Image = encodeImageToBase64(image);
-            return div(
+            DivTag div = div(
                 img()
                     .withSrc("data:image/png;base64," + base64Image)
                     .withAlt(altText)
                     .withClass("image")
             ).withClass("image_component " + className);
+            if (id != null) {
+                div = div.withId(id).attr("data-image-base64", base64Image);
+            }
+            return div;
         } catch (IOException e) {
             return div("Error loading image: " + e.getMessage())
                 .withClass("image_component error " + className);
@@ -57,6 +75,21 @@ public class ImageComponent extends Component {
 
     public String getClassName() {
         return className;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void updateImage(BufferedImage newImage) {
+        this.image = newImage;
+        this.componentContent = createImageDiv(newImage, altText, className, id);
+        try {
+            String base64Image = encodeImageToBase64(newImage);
+            addDataAttribute("image-base64", base64Image);
+        } catch (IOException e) {
+            // Silently ignore
+        }
     }
 
     @Override
