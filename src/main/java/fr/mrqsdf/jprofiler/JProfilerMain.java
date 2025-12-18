@@ -110,6 +110,11 @@ public class JProfilerMain {
 
         CSSManager.addRule(".back-button:hover")
                 .addProperty("background", "#764ba2");
+
+        CSSManager.addRule(".title")
+                .addProperty("font-size", "32px")
+                .addProperty("font-weight", "bold")
+                .addProperty("margin-bottom", "20px");
     }
 
     private static void createHomePage() {
@@ -120,42 +125,17 @@ public class JProfilerMain {
 
         // Create demo cards as HTML components
         ButtonComponent cardButton1 = new ButtonComponent("Simple Form Demo", null, ActionType.NAVIGATE_PAGE, "simpleForm");
-
-        TextComponent card2 = new TextComponent(createDemoCard(
-                "Interactive Demo",
-                "Real-time interactive configuration with counters, multipliers and auto-increment.",
-                "interactive"), "demo-card-wrapper");
-
-        TextComponent card3 = new TextComponent(createDemoCard(
-                "Config Binding Demo",
-                "Direct binding to Java class properties. Modify server configuration in real-time.",
-                "configBinding"), "demo-card-wrapper");
-
-        TextComponent card4 = new TextComponent(createDemoCard(
-                "Fibonacci Demo",
-                "Calculate Fibonacci numbers with performance profiling and real-time updates.",
-                "fibonacci"), "demo-card-wrapper");
-
-        TextComponent card5 = new TextComponent(createDemoCard(
-                "Dynamic Components Demo",
-                "Showcase of all dynamic component types with live updates via SSE.",
-                "dynamicComponents"), "demo-card-wrapper");
-
+        ButtonComponent cardButton2 = new ButtonComponent("Interactive Demo", null, ActionType.NAVIGATE_PAGE, "interactive");
+        ButtonComponent cardButton3 = new ButtonComponent("Config Binding Demo", null, ActionType.NAVIGATE_PAGE, "configBinding");
+        ButtonComponent cardButton4 = new ButtonComponent("Fibonacci Demo", null, ActionType.NAVIGATE_PAGE, "fibonacci");
+        ButtonComponent cardButton5 = new ButtonComponent("Dynamic Components Demo", null, ActionType.NAVIGATE_PAGE, "dynamicComponents");
         homePage.addToBody(header);
         homePage.addToBody(subtitle);
         homePage.addToBody(cardButton1);
-        homePage.addToBody(card2);
-        homePage.addToBody(card3);
-        homePage.addToBody(card4);
-        homePage.addToBody(card5);
-    }
-
-    private static String createDemoCard(String title, String description, String targetPage) {
-        return "<div class='demo-card' onclick=\"navigateToPage('" + targetPage + "')\">" +
-               "<h2>" + title + "</h2>" +
-               "<p>" + description + "</p>" +
-               "<div class='demo-button'>Launch Demo</div>" +
-               "</div>";
+        homePage.addToBody(cardButton2);
+        homePage.addToBody(cardButton3);
+        homePage.addToBody(cardButton4);
+        homePage.addToBody(cardButton5);
     }
 
     private static void createSimpleFormDemo() {
@@ -164,8 +144,8 @@ public class JProfilerMain {
         // Back button
         ButtonComponent backButton = new ButtonComponent("← Back to Home", "back-button", ActionType.NAVIGATE_PAGE, "home");
 
-        TextComponent title = new TextComponent("<h1>Simple Form Demo</h1>", "title");
-        TextComponent description = new TextComponent("<p>Enter a message and click 'Send Message' to see the counter increment.</p>", "description");
+        TextComponent title = new TextComponent("Simple Form Demo", "title");
+        TextComponent description = new TextComponent("Enter a message and click 'Send Message' to see the counter increment.", "description");
 
         // Bindable properties
         BindableProperty<String> messageProp = new BindableProperty<>("messageProp", "", String.class);
@@ -213,7 +193,7 @@ public class JProfilerMain {
         Page page = JProfiler.createPage("interactive", "🎮 Interactive Demo");
 
         ButtonComponent backButton = new ButtonComponent("← Back to Home", "back-button", ActionType.NAVIGATE_PAGE, "home");
-        TextComponent title = new TextComponent("<h1>Interactive Configuration Demo</h1>", "title");
+        TextComponent title = new TextComponent("Interactive Configuration Demo", "title");
 
         // Bindable properties
         BindableProperty<String> usernameProp = new BindableProperty<>("usernameProp", "User", String.class);
@@ -275,8 +255,8 @@ public class JProfilerMain {
         Page page = JProfiler.createPage("configBinding", "⚙️ Config Binding Demo");
 
         ButtonComponent backButton = new ButtonComponent("← Back to Home", "back-button", ActionType.NAVIGATE_PAGE, "home");
-        TextComponent title = new TextComponent("<h1>Server Configuration Binding</h1>", "title");
-        TextComponent description = new TextComponent("<p>Modify server configuration in real-time. Changes are immediately reflected in the ServerConfig object.</p>", "description");
+        TextComponent title = new TextComponent("Server Configuration Binding", "title");
+        TextComponent description = new TextComponent("Modify server configuration in real-time. Changes are immediately reflected in the ServerConfig object.", "description");
 
         // Server config object
         ServerConfig config = new ServerConfig();
@@ -347,7 +327,7 @@ public class JProfilerMain {
         Page page = JProfiler.createPage("fibonacci", "🔢 Fibonacci Demo");
 
         ButtonComponent backButton = new ButtonComponent("← Back to Home", "back-button", ActionType.NAVIGATE_PAGE, "home");
-        TextComponent title = new TextComponent("<h1>Fibonacci Calculator with Profiling</h1>", "title");
+        TextComponent title = new TextComponent("Fibonacci Calculator with Profiling", "title");
 
         // Bindable properties
         BindableProperty<Integer> nProp = new BindableProperty<>("nProp", 10, Integer.class);
@@ -398,8 +378,8 @@ public class JProfilerMain {
         Page page = JProfiler.createPage("dynamicComponents", "🎨 Dynamic Components Demo");
 
         ButtonComponent backButton = new ButtonComponent("← Back to Home", "back-button", ActionType.NAVIGATE_PAGE, "home");
-        TextComponent title = new TextComponent("<h1>Dynamic Components Showcase</h1>", "title");
-        TextComponent description = new TextComponent("<p>Watch these components update in real-time via Server-Sent Events (SSE)</p>", "description");
+        TextComponent title = new TextComponent("Dynamic Components Showcase", "title");
+        TextComponent description = new TextComponent("Watch these components update in real-time via Server-Sent Events (SSE)", "description");
 
         // Dynamic text with timestamp
         DynamicTextComponent timestampText = new DynamicTextComponent("timestamp",
