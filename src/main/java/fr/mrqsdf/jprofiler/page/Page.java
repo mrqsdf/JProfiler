@@ -79,10 +79,6 @@ public class Page {
             .map(Component::getContent)
             .toArray(DomContent[]::new);
 
-        DomContent[] bodyContent = bodyComponents.stream()
-            .map(Component::getContent)
-            .toArray(DomContent[]::new);
-
         DomContent[] footerContent = footerComponents.stream()
             .map(Component::getContent)
             .toArray(DomContent[]::new);
