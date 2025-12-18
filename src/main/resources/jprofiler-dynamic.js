@@ -192,11 +192,87 @@
         }
     }
 
+    // Send event to backend
+    function sendEvent(componentId, eventType, data) {
+        fetch('/event', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                componentId: componentId,
+                type: eventType,
+                data: data
+            })
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.status !== 'ok') {
+                console.error('Event error:', result);
+            }
+        })
+        .catch(error => {
+            console.error('Error sending event:', error);
+        });
+    }
+
+    // Setup event listeners for interactive components
+    function setupComponentListeners() {
+        // Text fields
+        document.querySelectorAll('input[type="text"], input[type="number"], input[type="email"]').forEach(function(input) {
+            const componentDiv = input.closest('div[id]');
+            if (componentDiv) {
+                const componentId = componentDiv.id;
+                
+                // Send on enter key
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        sendEvent(componentId, 'TEXT_INPUT', { value: input.value });
+                    }
+                });
+                
+                // Send on blur (focus lost)
+                input.addEventListener('blur', function() {
+                    sendEvent(componentId, 'TEXT_CHANGE', { value: input.value });
+                });
+            }
+        });
+
+        // Checkboxes
+        document.querySelectorAll('input[type="checkbox"]').forEach(function(checkbox) {
+            const componentDiv = checkbox.closest('div[id]');
+            if (componentDiv) {
+                const componentId = componentDiv.id;
+                checkbox.addEventListener('change', function() {
+                    sendEvent(componentId, 'CHECKBOX_CHANGE', { checked: checkbox.checked });
+                });
+            }
+        });
+
+        // Buttons
+        document.querySelectorAll('button').forEach(function(button) {
+            const componentDiv = button.closest('div[id]');
+            if (componentDiv) {
+                const componentId = componentDiv.id;
+                // Only add if no onclick already defined
+                if (!button.hasAttribute('onclick') || button.getAttribute('onclick') === '') {
+                    button.addEventListener('click', function() {
+                        sendEvent(componentId, 'BUTTON_CLICK', { text: button.textContent });
+                    });
+                }
+            }
+        });
+    }
+
     // Connect on page load
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', connectSSE);
+        document.addEventListener('DOMContentLoaded', function() {
+            connectSSE();
+            setupComponentListeners();
+        });
     } else {
         connectSSE();
+        setupComponentListeners();
     }
 
     // Cleanup on page unload
@@ -205,4 +281,9 @@
             eventSource.close();
         }
     });
+
+    // Expose sendEvent globally for custom usage
+    window.JProfiler = {
+        sendEvent: sendEvent
+    };
 })();

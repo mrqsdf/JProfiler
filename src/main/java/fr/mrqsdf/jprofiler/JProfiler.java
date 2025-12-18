@@ -255,10 +255,58 @@ public class JProfiler {
         return server != null && server.isRunning();
     }
 
+    // Debug configuration
+    public static void enableDebug() {
+        JProfilerDebug.setDebugEnabled(true);
+    }
+
+    public static void disableDebug() {
+        JProfilerDebug.setDebugEnabled(false);
+    }
+
+    public static void setDebugEnabled(boolean enabled) {
+        JProfilerDebug.setDebugEnabled(enabled);
+    }
+
+    public static void setLogEvents(boolean enabled) {
+        JProfilerDebug.setLogEvents(enabled);
+    }
+
+    public static void setLogUpdates(boolean enabled) {
+        JProfilerDebug.setLogUpdates(enabled);
+    }
+
+    public static void setLogBindings(boolean enabled) {
+        JProfilerDebug.setLogBindings(enabled);
+    }
+
+    // Event and Binding API
+    public static void addEventListener(String componentId, fr.mrqsdf.jprofiler.event.ComponentEventListener listener) {
+        fr.mrqsdf.jprofiler.event.ComponentEventManager.getInstance().addEventListener(componentId, listener);
+    }
+
+    public static void addGlobalEventListener(fr.mrqsdf.jprofiler.event.ComponentEventListener listener) {
+        fr.mrqsdf.jprofiler.event.ComponentEventManager.getInstance().addGlobalEventListener(listener);
+    }
+
+    public static <T> fr.mrqsdf.jprofiler.binding.BindableProperty<T> bindProperty(String componentId, String propertyName, T initialValue, Class<T> type) {
+        return fr.mrqsdf.jprofiler.binding.BindingManager.getInstance().bindValue(componentId, propertyName, initialValue, type);
+    }
+
+    public static <T> void bindComponent(String componentId, fr.mrqsdf.jprofiler.binding.BindableProperty<T> property) {
+        fr.mrqsdf.jprofiler.binding.BindingManager.getInstance().bind(componentId, property);
+    }
+
+    public static <T> fr.mrqsdf.jprofiler.binding.BindableProperty<T> getProperty(String componentId) {
+        return fr.mrqsdf.jprofiler.binding.BindingManager.getInstance().getProperty(componentId);
+    }
+
     public static void reset() {
         instance = null;
         server = null;
         serverThread = null;
+        fr.mrqsdf.jprofiler.event.ComponentEventManager.getInstance().reset();
+        fr.mrqsdf.jprofiler.binding.BindingManager.getInstance().reset();
     }
 
 }

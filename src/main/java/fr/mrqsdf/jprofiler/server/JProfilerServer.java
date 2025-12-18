@@ -148,9 +148,63 @@ public class JProfilerServer {
             }
         });
 
+        // Event receiver servlet
+        ServletHolder eventHolder = new ServletHolder(new HttpServlet() {
+            @Override
+            protected void doPost(HttpServletRequest request, HttpServletResponse response)
+                    throws ServletException, IOException {
+                response.setContentType("application/json;charset=utf-8");
+                response.setHeader("Access-Control-Allow-Origin", "*");
+                
+                try {
+                    // Read JSON body
+                    String body = new String(request.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+                    com.google.gson.JsonObject json = new com.google.gson.Gson().fromJson(body, com.google.gson.JsonObject.class);
+                    
+                    String componentId = json.get("componentId").getAsString();
+                    String eventType = json.get("type").getAsString();
+                    
+                    // Parse event data
+                    java.util.Map<String, Object> eventData = new java.util.HashMap<>();
+                    if (json.has("data")) {
+                        com.google.gson.JsonObject data = json.getAsJsonObject("data");
+                        for (String key : data.keySet()) {
+                            com.google.gson.JsonElement element = data.get(key);
+                            if (element.isJsonPrimitive()) {
+                                com.google.gson.JsonPrimitive primitive = element.getAsJsonPrimitive();
+                                if (primitive.isString()) {
+                                    eventData.put(key, primitive.getAsString());
+                                } else if (primitive.isBoolean()) {
+                                    eventData.put(key, primitive.getAsBoolean());
+                                } else if (primitive.isNumber()) {
+                                    eventData.put(key, primitive.getAsDouble());
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Create and dispatch event
+                    fr.mrqsdf.jprofiler.event.ComponentEvent.EventType type = 
+                        fr.mrqsdf.jprofiler.event.ComponentEvent.EventType.valueOf(eventType);
+                    fr.mrqsdf.jprofiler.event.ComponentEvent event = 
+                        new fr.mrqsdf.jprofiler.event.ComponentEvent(componentId, type, eventData);
+                    
+                    fr.mrqsdf.jprofiler.event.ComponentEventManager.getInstance().dispatchEvent(event);
+                    
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    response.getWriter().write("{\"status\":\"ok\"}");
+                } catch (Exception e) {
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    response.getWriter().write("{\"status\":\"error\",\"message\":\"" + e.getMessage() + "\"}");
+                    e.printStackTrace();
+                }
+            }
+        });
+
         context.addServlet(mainHolder, "/");
         context.addServlet(jsHolder, "/jprofiler-dynamic.js");
         context.addServlet(sseHolder, "/updates");
+        context.addServlet(eventHolder, "/event");
         server.setHandler(context);
 
         server.start();
