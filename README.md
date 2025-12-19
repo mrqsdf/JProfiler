@@ -76,6 +76,31 @@ All components render HTML using `j2html` with proper IDs and data attributes to
 - **DynamicTextComponent**: `new DynamicTextComponent(String id, String template, String className)`
   - Template placeholders like `{username}` are updated via SSE.
 
+- **ChartComponent**: `new ChartComponent(List<Double> data, List<String> labels, ChartType type, String title, String className, String id)`
+  - Supported chart types: `BAR`, `LINE`, `PIE`
+  - Bar chart color customization: `setBarColor(int index, Color color)`, `setDefaultBarColor(Color color)`
+  - Multi-line chart support: `addLineSeries(String name, List<Double> data)`, `setLineColor(String name, Color color)`
+  - Legend visibility: `setShowDetails(boolean show)`
+  - Dynamic updates: `updateChart(List<Double> newData, List<String> newLabels)` then `JProfiler.updateChart(id, chart.getContent().render())`
+  
+  **Bar Chart Example:**
+  ```java
+  ChartComponent barChart = new ChartComponent(data, labels, ChartType.BAR, "Sales", "chart", "myBar");
+  barChart.setBarColor(0, Color.RED);    // First bar in red
+  barChart.setBarColor(2, Color.GREEN);  // Third bar in green
+  barChart.setDefaultBarColor(Color.BLUE); // Others in blue
+  ```
+  
+  **Multi-Line Chart Example:**
+  ```java
+  ChartComponent multiLine = new ChartComponent(Collections.emptyList(), labels, ChartType.LINE, "Performance", "chart", "multiLine");
+  multiLine.addLineSeries("Sales", Arrays.asList(45.0, 52.0, 65.0, 70.0));
+  multiLine.addLineSeries("Profit", Arrays.asList(20.0, 28.0, 35.0, 40.0));
+  multiLine.setLineColor("Sales", new Color(70, 130, 180));  // Steel blue
+  multiLine.setLineColor("Profit", new Color(34, 139, 34));  // Forest green
+  multiLine.setShowDetails(true); // Show legend with series names
+  ```
+
 See: [component/](src/main/java/fr/mrqsdf/jprofiler/component)
 
 ---

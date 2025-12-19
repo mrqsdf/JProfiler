@@ -7,9 +7,11 @@ import fr.mrqsdf.jprofiler.css.CSSManager;
 import fr.mrqsdf.jprofiler.event.ComponentEvent;
 import fr.mrqsdf.jprofiler.page.Page;
 
+import java.awt.Color;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -441,6 +443,12 @@ public class JProfilerMain {
             "barChart"
         );
         barChart.setShowDetails(true);
+        
+        // Customize bar colors (demo)
+        barChart.setBarColor(0, java.awt.Color.RED);        // Monday -> Red
+        barChart.setBarColor(2, java.awt.Color.GREEN);      // Wednesday -> Green
+        barChart.setBarColor(4, java.awt.Color.ORANGE);     // Friday -> Orange
+        barChart.setDefaultBarColor(java.awt.Color.BLUE);   // Others -> Blue
 
 
         // Controls for Bar Chart
@@ -502,6 +510,28 @@ public class JProfilerMain {
                 JProfiler.updateChart("lineChart", lineChart.getContent().render());
             }
         });
+
+        // Multi-Line Chart
+        List<String> multiLineLabels = Arrays.asList("Jan", "Feb", "Mar", "Apr", "May", "Jun");
+        ChartComponent multiLineChart = new ChartComponent(
+            Collections.emptyList(),
+            multiLineLabels,
+            ChartComponent.ChartType.LINE,
+            "Sales vs Profit (Multi-Line)",
+            "chart-item",
+            "multiLineChart"
+        );
+
+        // Add multiple series with custom colors
+        multiLineChart.addLineSeries("Sales", Arrays.asList(45.0, 52.0, 48.0, 65.0, 58.0, 70.0));
+        multiLineChart.addLineSeries("Profit", Arrays.asList(20.0, 28.0, 25.0, 35.0, 32.0, 40.0));
+        multiLineChart.addLineSeries("Expenses", Arrays.asList(25.0, 24.0, 23.0, 30.0, 26.0, 30.0));
+        
+        multiLineChart.setLineColor("Sales", new Color(70, 130, 180));    // Steel blue
+        multiLineChart.setLineColor("Profit", new Color(34, 139, 34));    // Forest green
+        multiLineChart.setLineColor("Expenses", new Color(220, 20, 60));  // Crimson
+        
+        multiLineChart.setShowDetails(true);
 
         // Pie Chart
         List<Double> pieData = Arrays.asList(30.0, 25.0, 20.0, 15.0, 10.0);
@@ -590,6 +620,7 @@ public class JProfilerMain {
         // Charts
         page.addToBody(barChart);
         page.addToBody(lineChart);
+        page.addToBody(multiLineChart);
         page.addToBody(pieChart);
 
         // Controls sections
