@@ -26,6 +26,10 @@ public abstract class Component {
         return componentContent;
     }
 
+    public String render(){
+        return componentContent.render();
+    }
+
     /**
      * Set the component ID for dynamic updates
      */

@@ -379,6 +379,47 @@ public class JProfilerMain {
         return fibonacci(n - 1) + fibonacci(n - 2);
     }
 
+    // ===== Helpers for chart parsing/rendering =====
+    private static List<Double> parseDoubles(String csv) {
+        try {
+            if (csv == null || csv.trim().isEmpty()) return List.of();
+            String[] parts = csv.split(",");
+            java.util.ArrayList<Double> list = new java.util.ArrayList<>();
+            for (String p : parts) {
+                String t = p.trim();
+                if (!t.isEmpty()) {
+                    try {
+                        list.add(Double.parseDouble(t));
+                    } catch (NumberFormatException ignored) {}
+                }
+            }
+            return list;
+        } catch (Exception e) {
+            return List.of();
+        }
+    }
+
+    private static List<String> parseStrings(String csv) {
+        if (csv == null || csv.trim().isEmpty()) return List.of();
+        String[] parts = csv.split(",");
+        java.util.ArrayList<String> list = new java.util.ArrayList<>();
+        for (String p : parts) {
+            String t = p.trim();
+            if (!t.isEmpty()) list.add(t);
+        }
+        return list;
+    }
+
+    private static String joinDoubles(List<Double> values) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < values.size(); i++) {
+            if (i > 0) sb.append(',');
+            // keep one decimal like charts display
+            sb.append(String.format(java.util.Locale.US, "%.1f", values.get(i)));
+        }
+        return sb.toString();
+    }
+
     private static void createChartDemo() {
         Page page = JProfiler.createPage("chart", "📊 Chart Demo");
 
@@ -399,8 +440,33 @@ public class JProfilerMain {
             "chart-item",
             "barChart"
         );
-
         barChart.setShowDetails(true);
+
+
+        // Controls for Bar Chart
+        BindableProperty<String> barValuesProp = new BindableProperty<>("barValuesProp", joinDoubles(sampleData), String.class);
+        BindableProperty<String> barLabelsProp = new BindableProperty<>("barLabelsProp", String.join(",", sampleLabels), String.class);
+        BindableProperty<Boolean> barDetailsProp = new BindableProperty<>("barDetailsProp", true, Boolean.class);
+
+        TextFieldComponent barValuesField = new TextFieldComponent("barValues", "Bar values (comma separated)", "input-field");
+        TextFieldComponent barLabelsField = new TextFieldComponent("barLabels", "Bar labels (comma separated)", "input-field");
+        CheckboxComponent barShowDetails = new CheckboxComponent("barShowDetails", "Show legend (details)", "checkbox", true);
+        ButtonComponent barUpdateBtn = new ButtonComponent("Update Bar Chart", "button", null, null, "updateBar");
+
+        JProfiler.bindComponent("barValues", barValuesProp);
+        JProfiler.bindComponent("barLabels", barLabelsProp);
+        JProfiler.bindComponent("barShowDetails", barDetailsProp);
+
+        JProfiler.addEventListener("updateBar", event -> {
+            if (event.getType() == ComponentEvent.EventType.BUTTON_CLICK) {
+                List<Double> newData = parseDoubles(barValuesProp.getValue());
+                List<String> newLabels = parseStrings(barLabelsProp.getValue());
+                barChart.setShowDetails(Boolean.TRUE.equals(barDetailsProp.getValue()));
+                barChart.updateChart(newData.isEmpty() ? sampleData : newData,
+                                     newLabels.isEmpty() ? sampleLabels : newLabels);
+                JProfiler.updateChart("barChart", barChart.getContent().render());
+            }
+        });
         // Line Chart
         ChartComponent lineChart = new ChartComponent(
             sampleData,
@@ -410,8 +476,32 @@ public class JProfilerMain {
             "chart-item",
             "lineChart"
         );
-
         lineChart.setShowDetails(false);
+
+        // Controls for Line Chart
+        BindableProperty<String> lineValuesProp = new BindableProperty<>("lineValuesProp", joinDoubles(sampleData), String.class);
+        BindableProperty<String> lineLabelsProp = new BindableProperty<>("lineLabelsProp", String.join(",", sampleLabels), String.class);
+        BindableProperty<Boolean> lineDetailsProp = new BindableProperty<>("lineDetailsProp", false, Boolean.class);
+
+        TextFieldComponent lineValuesField = new TextFieldComponent("lineValues", "Line values (comma separated)", "input-field");
+        TextFieldComponent lineLabelsField = new TextFieldComponent("lineLabels", "Line labels (comma separated)", "input-field");
+        CheckboxComponent lineShowDetails = new CheckboxComponent("lineShowDetails", "Show legend (details)", "checkbox", false);
+        ButtonComponent lineUpdateBtn = new ButtonComponent("Update Line Chart", "button", null, null, "updateLine");
+
+        JProfiler.bindComponent("lineValues", lineValuesProp);
+        JProfiler.bindComponent("lineLabels", lineLabelsProp);
+        JProfiler.bindComponent("lineShowDetails", lineDetailsProp);
+
+        JProfiler.addEventListener("updateLine", event -> {
+            if (event.getType() == ComponentEvent.EventType.BUTTON_CLICK) {
+                List<Double> newData = parseDoubles(lineValuesProp.getValue());
+                List<String> newLabels = parseStrings(lineLabelsProp.getValue());
+                lineChart.setShowDetails(Boolean.TRUE.equals(lineDetailsProp.getValue()));
+                lineChart.updateChart(newData.isEmpty() ? sampleData : newData,
+                                      newLabels.isEmpty() ? sampleLabels : newLabels);
+                JProfiler.updateChart("lineChart", lineChart.getContent().render());
+            }
+        });
 
         // Pie Chart
         List<Double> pieData = Arrays.asList(30.0, 25.0, 20.0, 15.0, 10.0);
@@ -426,13 +516,100 @@ public class JProfilerMain {
             "pieChart"
         );
 
+        pieChart.setShowDetails(true);
+
+        // Controls for Pie Chart
+        BindableProperty<String> pieValuesProp = new BindableProperty<>("pieValuesProp", joinDoubles(pieData), String.class);
+        BindableProperty<String> pieLabelsProp = new BindableProperty<>("pieLabelsProp", String.join(",", pieLabels), String.class);
+        BindableProperty<Boolean> pieDetailsProp = new BindableProperty<>("pieDetailsProp", true, Boolean.class);
+
+        TextFieldComponent pieValuesField = new TextFieldComponent("pieValues", "Pie values (comma separated)", "input-field");
+        TextFieldComponent pieLabelsField = new TextFieldComponent("pieLabels", "Pie labels (comma separated)", "input-field");
+        CheckboxComponent pieShowDetails = new CheckboxComponent("pieShowDetails", "Show legend (details)", "checkbox", true);
+        ButtonComponent pieUpdateBtn = new ButtonComponent("Update Pie Chart", "button", null, null, "updatePie");
+
+        JProfiler.bindComponent("pieValues", pieValuesProp);
+        JProfiler.bindComponent("pieLabels", pieLabelsProp);
+        JProfiler.bindComponent("pieShowDetails", pieDetailsProp);
+
+        JProfiler.addEventListener("updatePie", event -> {
+            if (event.getType() == ComponentEvent.EventType.BUTTON_CLICK) {
+                List<Double> newData = parseDoubles(pieValuesProp.getValue());
+                List<String> newLabels = parseStrings(pieLabelsProp.getValue());
+                pieChart.setShowDetails(Boolean.TRUE.equals(pieDetailsProp.getValue()));
+                pieChart.updateChart(newData.isEmpty() ? pieData : newData,
+                                     newLabels.isEmpty() ? pieLabels : newLabels);
+                JProfiler.updateChart("pieChart", pieChart.getContent().render());
+            }
+        });
+
+        // ===== Auto-update (no front bindings): change last value + last label every second =====
+        Thread chartAutoUpdateThread = new Thread(() -> {
+            DateTimeFormatter timeFmt = DateTimeFormatter.ofPattern("HH:mm:ss");
+            while (true) {
+                try {
+                    Thread.sleep(1000);
+
+                    String time = LocalDateTime.now().format(timeFmt);
+
+                    // Update BAR + LINE last value and label
+                    int lastIdxBL = sampleData.size() - 1;
+                    double blDelta = (Math.random() * 12.0) - 6.0; // +/-6
+                    double blNew = Math.max(0.0, sampleData.get(lastIdxBL) + blDelta);
+                    sampleData.set(lastIdxBL, blNew);
+                    int lastLblBL = sampleLabels.size() - 1;
+                    sampleLabels.set(lastLblBL, "Sat " + time);
+
+                    barChart.updateChart(sampleData, sampleLabels);
+                    JProfiler.updateChart("barChart", barChart.getContent().render());
+                    lineChart.updateChart(sampleData, sampleLabels);
+                    JProfiler.updateChart("lineChart", lineChart.getContent().render());
+
+                    // Update PIE last value and label
+                    int lastIdxPie = pieData.size() - 1;
+                    double pDelta = (Math.random() * 8.0) - 4.0; // +/-4
+                    double pNew = Math.max(1.0, pieData.get(lastIdxPie) + pDelta);
+                    pieData.set(lastIdxPie, pNew);
+                    int lastLblPie = pieLabels.size() - 1;
+                    pieLabels.set(lastLblPie, "Product E " + time);
+
+                    pieChart.updateChart(pieData, pieLabels);
+                    JProfiler.updateChart("pieChart", pieChart.getContent().render());
+                } catch (InterruptedException e) {
+                    break;
+                }
+            }
+        });
+        chartAutoUpdateThread.setDaemon(true);
+        chartAutoUpdateThread.start();
+
         // Add all components to page
         page.addToBody(backButton);
         page.addToBody(title);
         page.addToBody(description);
+        // Charts
         page.addToBody(barChart);
         page.addToBody(lineChart);
         page.addToBody(pieChart);
+
+        // Controls sections
+        page.addToBody(new TextComponent("<h2>Update Bar Chart</h2>", null));
+        page.addToBody(barValuesField);
+        page.addToBody(barLabelsField);
+        page.addToBody(barShowDetails);
+        page.addToBody(barUpdateBtn);
+
+        page.addToBody(new TextComponent("<h2>Update Line Chart</h2>", null));
+        page.addToBody(lineValuesField);
+        page.addToBody(lineLabelsField);
+        page.addToBody(lineShowDetails);
+        page.addToBody(lineUpdateBtn);
+
+        page.addToBody(new TextComponent("<h2>Update Pie Chart</h2>", null));
+        page.addToBody(pieValuesField);
+        page.addToBody(pieLabelsField);
+        page.addToBody(pieShowDetails);
+        page.addToBody(pieUpdateBtn);
     }
 
     private static void createDynamicComponentsDemo() {
