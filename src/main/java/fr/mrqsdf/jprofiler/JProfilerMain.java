@@ -9,6 +9,8 @@ import fr.mrqsdf.jprofiler.page.Page;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Main entry point for JProfiler with a menu to access all demos
@@ -32,6 +34,7 @@ public class JProfilerMain {
             createConfigBindingDemo();
             createFibonacciDemo();
             createDynamicComponentsDemo();
+            createChartDemo();
 
             // Set home page as current
             JProfiler.setCurrentPage("home");
@@ -129,6 +132,7 @@ public class JProfilerMain {
         ButtonComponent cardButton3 = new ButtonComponent("Config Binding Demo", null, ActionType.NAVIGATE_PAGE, "configBinding");
         ButtonComponent cardButton4 = new ButtonComponent("Fibonacci Demo", null, ActionType.NAVIGATE_PAGE, "fibonacci");
         ButtonComponent cardButton5 = new ButtonComponent("Dynamic Components Demo", null, ActionType.NAVIGATE_PAGE, "dynamicComponents");
+        ButtonComponent cardButton6 = new ButtonComponent("Chart Demo", null, ActionType.NAVIGATE_PAGE, "chart");
         homePage.addToBody(header);
         homePage.addToBody(subtitle);
         homePage.addToBody(cardButton1);
@@ -136,6 +140,7 @@ public class JProfilerMain {
         homePage.addToBody(cardButton3);
         homePage.addToBody(cardButton4);
         homePage.addToBody(cardButton5);
+        homePage.addToBody(cardButton6);
     }
 
     private static void createSimpleFormDemo() {
@@ -372,6 +377,62 @@ public class JProfilerMain {
     private static long fibonacci(int n) {
         if (n <= 1) return n;
         return fibonacci(n - 1) + fibonacci(n - 2);
+    }
+
+    private static void createChartDemo() {
+        Page page = JProfiler.createPage("chart", "📊 Chart Demo");
+
+        ButtonComponent backButton = new ButtonComponent("← Back to Home", "back-button", ActionType.NAVIGATE_PAGE, "home");
+        TextComponent title = new TextComponent("<h1>Chart Components Showcase</h1>", "title");
+        TextComponent description = new TextComponent("<p>Explore different chart types: Bar, Line, and Pie charts with sample data.</p>", "description");
+
+        // Sample data
+        List<Double> sampleData = Arrays.asList(45.0, 38.0, 52.0, 65.0, 48.0, 72.0);
+        List<String> sampleLabels = Arrays.asList("Mon", "Tue", "Wed", "Thu", "Fri", "Sat");
+
+        // Bar Chart
+        ChartComponent barChart = new ChartComponent(
+            sampleData,
+            sampleLabels,
+            ChartComponent.ChartType.BAR,
+            "Sales by Day (Bar Chart)",
+            "chart-item",
+            "barChart"
+        );
+
+        barChart.setShowDetails(true);
+        // Line Chart
+        ChartComponent lineChart = new ChartComponent(
+            sampleData,
+            sampleLabels,
+            ChartComponent.ChartType.LINE,
+            "Sales Trend (Line Chart)",
+            "chart-item",
+            "lineChart"
+        );
+
+        lineChart.setShowDetails(false);
+
+        // Pie Chart
+        List<Double> pieData = Arrays.asList(30.0, 25.0, 20.0, 15.0, 10.0);
+        List<String> pieLabels = Arrays.asList("Product A", "Product B", "Product C", "Product D", "Product E");
+        
+        ChartComponent pieChart = new ChartComponent(
+            pieData,
+            pieLabels,
+            ChartComponent.ChartType.PIE,
+            "Market Share (Pie Chart)",
+            "chart-item",
+            "pieChart"
+        );
+
+        // Add all components to page
+        page.addToBody(backButton);
+        page.addToBody(title);
+        page.addToBody(description);
+        page.addToBody(barChart);
+        page.addToBody(lineChart);
+        page.addToBody(pieChart);
     }
 
     private static void createDynamicComponentsDemo() {
